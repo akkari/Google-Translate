@@ -18,36 +18,38 @@ class translator:
 #        self.target_frame = Frame(parent)
 #        self.src_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
 #        self.target_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
-        top_frame = Frame(parent)
-        top_frame.pack(expand=YES, fill=BOTH)
+        for x in xrange(2):
+            parent.grid_rowconfigure(x, weight=1)
+        for y in xrange(4):
+            parent.grid_columnconfigure(y, weight=1)
 
         self.src_lang = StringVar()
         self.src_lang.set('检测语言') # default source language
-        self.src_om = OptionMenu(top_frame, self.src_lang, *option_list)
+        self.src_om = OptionMenu(parent, self.src_lang, *option_list)
 
         self.target_lang = StringVar()
         self.target_lang.set('中文(简体)') # default target language
-        self.target_om = OptionMenu(top_frame, self.target_lang, *option_list[1:])
+        self.target_om = OptionMenu(parent, self.target_lang, *option_list[1:])
 
-        self.input_box = Text(top_frame)
+        self.input_box = Text(parent)
         self.result = StringVar()
-        self.output_box = Label(top_frame, textvariable=self.result, relief=RIDGE, width=50)
+        self.output_box = Label(parent, textvariable=self.result, relief=RIDGE, width=50)
 
-        self.translate_button = Button(top_frame, text='翻译', command=self.translate, bg='#3369E8', fg='white')
+        self.translate_button = Button(parent, text='翻译', command=self.translate, bg='#3369E8', fg='white')
         self.input_box.bind('<Control-Return>', self.translate)
 
 
-        self.src_om.grid(row=0, column=0, rowspan=1, sticky=W)
-        self.target_om.grid(row=0, column=2, rowspan=1, sticky=W)
+        self.src_om.grid(row=0, column=0, sticky=W)
+        self.target_om.grid(row=0, column=2, sticky=W)
         self.translate_button.grid(row=0, column=3, sticky=W)
-        self.input_box.grid(row=2, column=0, columnspan=2, sticky=W+E+S+N)
-        self.output_box.grid(row=2, column=2, columnspan=1, sticky=W+E+S+N)
+        self.input_box.grid(row=1, column=0, sticky=W+E+S+N)
+        self.output_box.grid(row=1, column=2, columnspan=2, sticky=W+E+S+N)
 
     def translate(self, event=None):
-        html_received = self.get_html()
-        result = self.parse_html(html_received)
-        print result, repr(result)
-        self.result.set(urllib.unquote(result))
+        if self.input_box.get('1.0', END).strip():
+            html_received = self.get_html()
+            result = self.parse_html(html_received)
+            self.result.set(urllib.unquote(result))
 
     def parse_html(self, html):
         pattern = r";TRANSLATED_TEXT='([^']+)'"
