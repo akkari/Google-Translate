@@ -32,7 +32,7 @@ class translator:
 
         self.input_box = Text(self.src_frame, width=50)
         self.result = StringVar()
-        self.output_box = Label(self.target_bottom_frame, textvariable=self.result, relief=RIDGE, width=50)
+        self.output_box = Label(self.target_bottom_frame, textvariable=self.result, relief=RIDGE, width=50, anchor=NW, justify=LEFT)
 
         self.translate_button = Button(self.target_top_frame, text='翻译', command=self.translate, bg='#3369E8', fg='white')
         self.input_box.bind('<Control-Return>', self.translate)
@@ -53,6 +53,7 @@ class translator:
         if self.input_box.get('1.0', END).strip():
             html_received = self.get_html()
             result = self.parse_html(html_received)
+            print urllib.unquote(result)
             self.result.set(urllib.unquote(result))
 
     def parse_html(self, html):
