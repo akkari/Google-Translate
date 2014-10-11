@@ -9,41 +9,45 @@ import urllib, urllib2
 class translator:
     language_code = {'检测语言': 'auto', '英语': 'en', '日语': 'ja', '中文(简体)': 'zh-CN', '中文(繁体)': 'zh-TW', '德语': 'de', '俄语': 'ru',
                     '法语': 'fr', '意大利语': 'it', '韩语': 'ko'}
+
     def __init__(self, parent):
         self.draw_layout(parent)
 
     def draw_layout(self, parent):
         option_list = ('检测语言', '英语', '日语', '中文(简体)', '中文(繁体)', '德语', '俄语', '法语', '意大利语', '韩语')
-#        self.src_frame = Frame(parent)
-#        self.target_frame = Frame(parent)
-#        self.src_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
-#        self.target_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
-        for x in xrange(2):
-            parent.grid_rowconfigure(x, weight=1)
-        for y in xrange(4):
-            parent.grid_columnconfigure(y, weight=1)
+# Frames
+        self.src_frame = Frame(parent)
+        self.target_frame = Frame(parent)
+        self.target_top_frame = Frame(self.target_frame)
+        self.target_bottom_frame = Frame(self.target_frame)
 
+# Widgets
         self.src_lang = StringVar()
         self.src_lang.set('检测语言') # default source language
-        self.src_om = OptionMenu(parent, self.src_lang, *option_list)
+        self.src_om = OptionMenu(self.src_frame, self.src_lang, *option_list)
 
         self.target_lang = StringVar()
         self.target_lang.set('中文(简体)') # default target language
-        self.target_om = OptionMenu(parent, self.target_lang, *option_list[1:])
+        self.target_om = OptionMenu(self.target_top_frame, self.target_lang, *option_list[1:])
 
-        self.input_box = Text(parent)
+        self.input_box = Text(self.src_frame, width=50)
         self.result = StringVar()
-        self.output_box = Label(parent, textvariable=self.result, relief=RIDGE, width=50)
+        self.output_box = Label(self.target_bottom_frame, textvariable=self.result, relief=RIDGE, width=50)
 
-        self.translate_button = Button(parent, text='翻译', command=self.translate, bg='#3369E8', fg='white')
+        self.translate_button = Button(self.target_top_frame, text='翻译', command=self.translate, bg='#3369E8', fg='white')
         self.input_box.bind('<Control-Return>', self.translate)
 
+# Do the packing.
+        self.src_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
+        self.target_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
+        self.target_top_frame.pack(side=TOP, expand=NO, fill=X)
+        self.target_bottom_frame.pack(side=TOP, expand=YES, fill=BOTH)
 
-        self.src_om.grid(row=0, column=0, sticky=W)
-        self.target_om.grid(row=0, column=2, sticky=W)
-        self.translate_button.grid(row=0, column=3, sticky=W)
-        self.input_box.grid(row=1, column=0, sticky=W+E+S+N)
-        self.output_box.grid(row=1, column=2, columnspan=2, sticky=W+E+S+N)
+        self.src_om.pack(side=TOP, anchor=W)
+        self.input_box.pack(side=TOP, expand=YES, fill=BOTH)
+        self.target_om.pack(side=LEFT, anchor=W)
+        self.translate_button.pack(side=LEFT, anchor=W)
+        self.output_box.pack(side=LEFT, expand=YES, fill=BOTH)
 
     def translate(self, event=None):
         if self.input_box.get('1.0', END).strip():
