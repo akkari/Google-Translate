@@ -7,6 +7,7 @@ import re
 import urllib, urllib2
 from pygame import mixer
 from PIL import Image, ImageTk
+import tempfile
 
 class translator:
     language_code = {'检测语言': 'auto', '英语': 'en', '日语': 'ja', '中文(简体)': 'zh-CN', '中文(繁体)': 'zh-TW', '德语': 'de', '俄语': 'ru',
@@ -67,20 +68,36 @@ class translator:
         ie = 'UTF-8'
         if what == 'src':
             tl = self.language_code[self.src_lang.get().encode('utf8')]
-            q = self.input_box.get('1.0', END).strip().encode('utf8')
+            whole_text = self.input_box.get('1.0', END).strip()
         elif what == 'target':
             tl = self.language_code[self.target_lang.get().encode('utf8')]
-            q = self.result.get().encode('utf8')
-        data = {'ie': ie, 'tl': tl, 'q': q}
-        data = urllib.urlencode(data)
-        url = 'https://translate.google.cn/translate_tts'
-        header = {'User-Agent': 'Mozilla/5.0'}
+            whole_text = self.result.get().strip()
 
-        req = urllib2.Request(url, data, header)
-        response = urllib2.urlopen(req)
+        # Split the original text into small chunks and make separate requests to Google.
+        # All the returned mp3 files will be concatenated and then played.
 
+        total_length = len(whole_text)
+        max_chunk_length = 100
+        total = total_length / max_chunk_length + 1 if total_length % max_chunk_length else total_length / max_chunk_length # total number of chunk
+
+        temp_mp3 = tempfile.TemporaryFile(mode='r+')
+        for i in xrange(total):
+            if i == total - 1:
+                q = whole_text.encode('utf8')
+            else:
+                q = whole_text[:max_chunk_length].encode('utf8')
+                whole_text = whole_text[max_chunk_length:]
+            data = {'ie': ie, 'tl': tl, 'q': q, 'total': total, 'idx': str(i)}
+            data = urllib.urlencode(data)
+            url = 'https://translate.google.cn/translate_tts'
+            header = {'User-Agent': 'Mozilla/5.0'}
+
+            req = urllib2.Request(url, data, header)
+            temp_mp3.write(urllib2.urlopen(req).read())
+
+        temp_mp3.seek(0)
         mixer.init()
-        mixer.music.load(response)
+        mixer.music.load(temp_mp3)
         mixer.music.play()
 
     def translate(self, event=None):
