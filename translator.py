@@ -6,6 +6,7 @@ from Tkinter import *
 import re
 import urllib, urllib2
 from pygame import mixer
+from PIL import Image, ImageTk
 
 class translator:
     language_code = {'检测语言': 'auto', '英语': 'en', '日语': 'ja', '中文(简体)': 'zh-CN', '中文(繁体)': 'zh-TW', '德语': 'de', '俄语': 'ru',
@@ -40,8 +41,11 @@ class translator:
         self.translate_button = Button(self.target_top_frame, text='翻译', command=self.translate, bg='#3369E8', fg='white')
         self.input_box.bind('<Control-Return>', self.translate)
 
-        self.pronounce_src_button = Button(self.src_top_frame, text='朗读', command=lambda : self.pronounce('src'))
-        self.pronounce_target_button = Button(self.target_top_frame, text='朗读', command=lambda : self.pronounce('target'))
+
+        sound_icon = ImageTk.PhotoImage(Image.open('./icons/sound.png').resize((30,30)))
+        self.pronounce_src_button = Button(self.src_top_frame, image=sound_icon, command=lambda : self.pronounce('src'))
+        self.pronounce_target_button = Button(self.target_top_frame, image=sound_icon, command=lambda : self.pronounce('target'))
+        self.pronounce_src_button.img = sound_icon # keep the reference for the icon image.
 
 # Do the packing.
         self.src_frame.pack(side=LEFT, anchor=W, expand=YES, fill=BOTH)
