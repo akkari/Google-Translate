@@ -35,9 +35,8 @@ class translator:
         self.target_lang.set('中文(简体)') # default target language
         self.target_om = OptionMenu(self.target_top_frame, self.target_lang, *option_list[1:])
 
-        self.input_box = Text(self.src_bottom_frame, width=50)
-        self.result = StringVar()
-        self.output_box = Label(self.target_bottom_frame, textvariable=self.result, relief=RIDGE, width=50, anchor=NW, justify=LEFT)
+        self.input_box = Text(self.src_bottom_frame, width=50, wrap=WORD)
+        self.output_box = Text(self.target_bottom_frame, relief=RIDGE, width=50, wrap=WORD, bg='grey')
 
         self.translate_button = Button(self.target_top_frame, text='翻译', command=self.translate, bg='#3369E8', fg='white')
         self.input_box.bind('<Control-Return>', self.translate)
@@ -104,7 +103,9 @@ class translator:
         if self.input_box.get('1.0', END).strip():
             html_received = self.get_html()
             result = self.parse_html(html_received)
-            self.result.set(urllib.unquote(result))
+
+            self.output_box.delete('1.0', END)
+            self.output_box.insert('1.0', result)
 
     def parse_html(self, html):
         pattern = r";TRANSLATED_TEXT='([^']+)'"
