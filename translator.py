@@ -70,7 +70,7 @@ class translator:
             whole_text = self.input_box.get('1.0', END).strip()
         elif what == 'target':
             tl = self.language_code[self.target_lang.get().encode('utf8')]
-            whole_text = self.result.get().strip()
+            whole_text = self.output_box.get('1.0', END).strip()
 
         # Split the original text into small chunks and make separate requests to Google.
         # All the returned mp3 files will be concatenated and then played.
