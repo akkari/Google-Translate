@@ -111,7 +111,11 @@ class translator:
         pattern = r";TRANSLATED_TEXT='([^']+)'"
         match = re.search(pattern, html)
         result = match.group(1)
-        return result.replace(r'\x3cbr\x3e', '\n')
+
+        result = result.replace(r'\x3cbr\x3e', '\n')
+        result = result.replace(r'\x26#39;', "'")
+
+        return result
 
     def get_html(self):
         ie = 'UTF-8'
